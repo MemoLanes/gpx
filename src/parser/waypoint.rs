@@ -113,11 +113,28 @@ pub fn consume<R: Read>(context: &mut Context<R>, tagname: &'static str) -> GpxR
 
                     // Finally the GPX 1.1 extensions
                     "extensions" => extensions::consume(context)?,
+                    // NOTE: relax checking, we don't care about any other elements.
                     child => {
-                        return Err(GpxError::InvalidChildElement(
-                            String::from(child),
-                            "waypoint",
-                        ));
+                        let child = child.to_owned();
+                        let mut depth = 0;
+                        for event in context.reader() {
+                            match event? {
+                                XmlEvent::StartElement { name, .. } => {
+                                    if name.local_name == child {
+                                        depth += 1;
+                                    }
+                                }
+                                XmlEvent::EndElement { name } => {
+                                    if name.local_name == child {
+                                        depth -= 1;
+                                        if depth == 0 {
+                                            break;
+                                        }
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
                     }
                 }
             }
