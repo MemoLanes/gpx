@@ -64,7 +64,7 @@ pub fn consume<R: Read>(context: &mut Context<R>) -> Result<Gpx, GpxError> {
 
         match next_event {
             XmlEvent::StartElement { ref name, .. } => match name.local_name.as_ref() {
-                "metadata" if context.version != GpxVersion::Gpx10 => {
+                "metadata" => {
                     gpx.metadata = Some(metadata::consume(context)?);
                 }
                 "trk" => {
