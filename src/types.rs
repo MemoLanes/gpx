@@ -45,6 +45,27 @@ pub struct Gpx {
     pub routes: Vec<Route>,
 }
 
+impl Gpx {
+    /// Creates a new, empty Gpx object with a given GPX version.
+    ///
+    /// ```
+    /// extern crate gpx;
+    ///
+    /// use gpx::{Gpx, GpxVersion};
+    ///
+    /// fn main() {
+    ///     let mut gpx = Gpx::new(GpxVersion::Gpx11);
+    ///     assert_eq!(gpx.version, GpxVersion::Gpx11);
+    /// }
+    /// ```
+    pub fn new(version: GpxVersion) -> Gpx {
+        Gpx {
+            version,
+            ..Default::default()
+        }
+    }
+}
+
 /// Information about the copyright holder and any license governing use of this file.
 ///
 /// By linking to an appropriate license, you may place your data into the
@@ -380,6 +401,21 @@ impl Waypoint {
     /// ```
     pub fn point(&self) -> Point<f64> {
         self.point.0 //.0 to extract the geo_types::Point from the tuple struct GpxPoint
+    }
+
+    /// Returns a mutable reference to the point of the waypoint.
+    ///
+    /// ```
+    /// use gpx::Waypoint;
+    /// use geo_types::Point;
+    ///
+    /// let mut wpt = Waypoint::new(Point::new(-121.97, 37.24));
+    /// wpt.point_mut().set_x(100.34);
+    /// assert_eq!(wpt.point().x(), 100.34);
+    /// assert_eq!(wpt.point().y(), 37.24);
+    /// ```
+    pub fn point_mut(&mut self) -> &mut Point<f64> {
+        &mut self.point.0
     }
 
     /// Creates a new Waypoint from a given geographical point.
